@@ -22,6 +22,10 @@ import urllib
 from .helpers import *
 
 
+class TestContainerDidNotboot(Exception):
+    pass
+
+
 def do_setup_test_container(request, setup_test_container_props, mender_version):
     # This should be parametrized in the mother project.
     image = setup_test_container_props.image_name
@@ -46,7 +50,9 @@ def do_setup_test_container(request, setup_test_container_props, mender_version)
 
     ready = wait_for_container_boot(docker_container_id)
 
-    assert ready, "Image did not boot. Aborting"
+    if not ready:
+        raise TestContainerDidNotboot
+
     return setup_test_container_props
 
 
